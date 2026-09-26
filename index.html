@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>曲面 z = (y - x²)(y - 2x²)</title>
+  <!-- MathJax v2 の読み込み -->
+  <script type="text/javascript" async
+    src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+  </script>
+  <!-- Plotly.js の読み込み -->
+  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+  <style>
+    body { margin: 0; padding: 0; display: flex; justify-content: center; align-items: center; height: 100vh; }
+    #plot { width: 90vw; height: 90vh; }
+  </style>
+</head>
+<body>
+
+<div id="plot"></div>
+
+<script>
+  // 計算点を160（従来の2倍の密度）に設定
+  const size = 160;
+  const x = [], y = [], z = [];
+  
+  const xRange = 1.5;
+  const yRange = 2.0;
+
+  for (let i = 0; i < size; i++) {
+    x[i] = -xRange + (2 * xRange * i) / (size - 1);
+    y[i] = -0.5 + ((yRange + 0.5) * i) / (size - 1);
+  }
+
+  for (let i = 0; i < size; i++) {
+    z[i] = [];
+    for (let j = 0; j < size; j++) {
+      const xi = x[j];
+      const yj = y[i];
+      z[i][j] = (yj - Math.pow(xi, 2)) * (yj - 2 * Math.pow(xi, 2));
+    }
+  }
+
+  // 1. 曲面本体のデータ
+  const surfaceData = {
+    z: z,
+    x: x,
+    y: y,
+    type: 'surface',
+    colorscale: 'Viridis',
+    contours: {
+      x: { show: true, color: 'black', width: 0.8 },
+      y: { show: true, color: 'black', width: 0.8 }
+    }
+  };
+
+  // 2. 原点 (0, 0, 0) に置く黒丸のプロットデータ
+  const originPointData = {
+    x: [0],
+    y: [0],
+    z: [0],
+    mode: 'markers',
+    type: 'scatter3d',
+    name: '原点 (鞍点)',
+    marker: {
+      size: 8,
+      color: 'black',
+      symbol: 'circle'
+    }
+  };
+
+  const layout = {
+    title: { text: '$\\text{曲面 } z = (y - x^2)(y - 2x^2)$' },
+    autosize: true,
+    showlegend: false, // 凡例は非表示
+    scene: {
+      xaxis: { title: { text: '<i>x</i>' } },
+      yaxis: { title: { text: '<i>y</i>' } },
+      zaxis: { title: { text: '<i>z</i>' } }
+    }
+  };
+
+  // 2つのデータを重ね合わせて描画
+  Plotly.newPlot('plot', [surfaceData, originPointData], layout);
+</script>
+
+</body>
+</html>
